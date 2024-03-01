@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div id = "alert">
+    </div>
+    <div class = "container">
+        <div class="row">
+            <div class="col align-items-start justify-content-start">
+                <div style = "display: inline-block;"  id = "list-of-friend-request">
+                    {% if friend_requests %}
+                        {% for friend in friend_requests %}
+                            <div id = "{{friend}}" class = "friend-request-div">
+                                <div style = "margin-left: 20px;">
+                                    <strong>In coming friend request from: </strong>
+                                    <br>
+                                    <h4>{{ friend }}</h4>
+                                </div>
+
+                                <div style = "margin-right: 20px;">
+                                    <button onclick = "socketio.emit('accept', { friend : '{{friend}}'})" id = "accept">Accept</button>
+                                    <button onclick = "socketio.emit('decline', { friend : '{{friend}}'})" id = "decline">Ewww</button>
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                <div style = "display: flex;
+                              justify-content: start;
+                              margin-top: 20px;">
+                    <h2>Friends</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col align-items-start justify-content-start">
+                <div style = "display: inline-block;"  id = "list-of-friends">
+                    {% if friends %}
+                        {% for friend in friends %}
+
+                            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                <div style = "display: flex; align-items: center; justify-content: center;">
+                                    <div class = "friend-div" onclick="openchat('{{friend}}')">
+                                        <div>
+                                            <h4>{{ friend }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="dropend">
+                                        <button style = "background-color: rgb(235, 229, 229);
+                                                         padding-top: 40px;
+                                                         margin-top: 10px;
+                                                         border-top-left-radius: 0px;
+                                                         border-bottom-left-radius: 0px;" class = "btn btn-close" data-bs-toggle="dropdown" aria-expanded="false">
+                                        </button>
+                                        <div class="dropdown-menu" style = "cursor: pointer;">
+                                          <div style ="border: none;" ><div style = "color: white; background-color: rgb(209, 0, 0);" class="dropdown-item" onclick=" removeFriend('{{friend}}') ">Remove Friend</div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                    {% else %}
+                        <div><h2>No Friends lmao...</h2></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row ">
+            <div style = "display: flex;
+                          justify-content: center;" class="col">
+                <a href = "{{ url_for('AddFriend') }}">
+                    <button id = "add-friend-btn">Add Friends!</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+    
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script>
+    var socketio = io();
+
+    socketio.emit("loggedin", {})
+
+    socketio.on("requests{{personal_room_code}}", (obj) => {
+
+        if(obj.message == "Friend Request Accepted"){
+            window.location.href = "{{ url_for('Friends') }}";
+        }
+        
+        document.getElementById(`${obj.friend}`).innerHTML = "";
+        document.getElementById(`${obj.friend}`).setAttribute("class", "");
+
+        document.getElementById("alert").innerHTML = `<div class="alert alert-${obj.category} alert-dismissible fade show" role="alert">
+            ${obj.message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`;
+    })
+
+    function openchat(name){  //AJAX function to send the friends name to backend
+            $.ajax({
+                url: '{{url_for("SetUp")}}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 'friend': name }),
+                success: function(response) {
+                    socketio.emit("joinroom", {roomcode: response.roomcode});
+                }
+            });
+    }
+
+    socketio.on("joined{{personal_room_code}}", (obj)=>{
+        window.location.href = '{{ url_for("Chat") }}';
+    })
+
+
+    function removeFriend(name){
+        $.ajax({
+                url: '{{url_for("RemoveFriend")}}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 'friend': name }),
+                success: function(response) {
+                    window.location.href = '{{ url_for("Friends") }}';   //basically refreshing the page
+                } 
+        });
+    }
+
+</script>
+
+{% endblock %}

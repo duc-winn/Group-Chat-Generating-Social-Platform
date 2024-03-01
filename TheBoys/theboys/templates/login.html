@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class = "login-div">
+        <h1>Log In</h1>
+        <form method = "post" action="#">
+                <div class="form-input">
+                    <div>
+                        <label style="font-weight: 700;
+                                      font-size: 20px;">Username</label>
+                        <input id = "input" type = "text" name = "username"> 
+                    </div>
+                    <div>
+                        <label  style="font-weight: 700;
+                                       font-size: 20px;" >Password</label>
+                        <input id = "input" type = "password" name = "password">
+                    </div>
+                    <input  style="background-color: black;
+                                   border: none;
+                                   border-radius: 50px;
+                                   color: white;
+                                   padding-left: 20px;
+                                   padding-right: 20px;
+                                   padding-top: 5px;
+                                   padding-bottom: 5px;
+                                   font-size: 20px;
+                                   margin-top: 20px;" type = "submit" value="Log In">
+                </div>
+        </form>
+        <br>
+        <div>
+            <label>Don't have an account? Create one </label>
+            <a href = "{{ url_for('Create') }}" >here</a>
+        </div>
+    </div>
+
+{% endblock %}

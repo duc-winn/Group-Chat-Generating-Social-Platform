@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class = "container " style = "display: flex; align-items: center; justify-content: center; margin-top: 150px;">
+    <form method = "post" action = "#">
+        <input type = "submit" value = "CREATE YOUR PARTY!" style = "padding-top: 20px; padding-bottom: 20px; padding-left: 60px; padding-right: 60px; font-size: 35px;
+                        border: none; border-radius: 50px; background-color: rgb(75, 201, 159); box-shadow: 3px 3px 0px 0px rgb(0, 0, 0, 0.65);">
+    </form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type = "text/javascript">
+    var socketio = io();
+
+    socketio.emit("loggedin", {});
+
+    
+</script>
+
+{% endblock %}
